@@ -170,28 +170,41 @@ AVLNode* insert(AVLNode* node, Exame exame) {
     if (node == NULL)
         return createNode(exame);
 
+    // Comparação para encontrar a posição do nó
     if (strcmp(exame.nome, node->exame.nome) < 0)
         node->left = insert(node->left, exame);
     else if (strcmp(exame.nome, node->exame.nome) > 0)
         node->right = insert(node->right, exame);
-    else
+    else {
+        // Colisão detectada - o nome já existe, então atualizamos o exame
+        // Você pode atualizar outras informações aqui conforme necessário
+        memcpy(&node->exame, &exame, sizeof(Exame));
         return node;
+    }
 
+    // Atualiza a altura do nó atual
     node->height = 1 + max(height(node->left), height(node->right));
 
+    // Verifica o balanceamento para decidir se uma rotação é necessária
     int balance = getBalance(node);
 
+    // Se o nó ficar desbalanceado, há 4 casos a serem considerados
+
+    // Caso 1: Rotação simples à direita
     if (balance > 1 && strcmp(exame.nome, node->left->exame.nome) < 0)
         return rightRotate(node);
 
+    // Caso 2: Rotação simples à esquerda
     if (balance < -1 && strcmp(exame.nome, node->right->exame.nome) > 0)
         return leftRotate(node);
 
+    // Caso 3: Rotação dupla à esquerda-direita
     if (balance > 1 && strcmp(exame.nome, node->left->exame.nome) > 0) {
         node->left = leftRotate(node->left);
         return rightRotate(node);
     }
 
+    // Caso 4: Rotação dupla à direita-esquerda
     if (balance < -1 && strcmp(exame.nome, node->right->exame.nome) < 0) {
         node->right = rightRotate(node->right);
         return leftRotate(node);
@@ -295,8 +308,8 @@ int main() {
     root = insert(root, exame2);
     root = insert(root, exame3);
 
-    printf("Busca por nome 'Maria':\n");
-    searchByName(root, "Maria");
+    printf("Busca por nome 'Joao':\n");
+    searchByName(root, "Joao");
 
     printf("\nBusca por data '03/01/2023 10:59:08':\n");
     searchByDate("03/01/2023 10:59:08");
